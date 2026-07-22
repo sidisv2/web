@@ -28,7 +28,7 @@ export const BotConfigView: React.FC<BotConfigViewProps> = ({ botConfig, onUpdat
   const [whatsapp, setWhatsapp] = useState(botConfig.whatsappNumber);
   const [systemPrompt, setSystemPrompt] = useState(botConfig.customSystemPrompt);
 
-  const embedScript = `<script src="${window.location.origin}/embed/script.js" data-agent-id="${botConfig.agentId}" async></script>`;
+  const embedScript = `<script src="${window.location.origin}/aria-widget.js" data-agent-id="${botConfig.agentId}" async></script>`;
 
   const handleCopyScript = () => {
     navigator.clipboard.writeText(embedScript);

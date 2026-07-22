@@ -185,7 +185,7 @@ ${propertyCatalogContext}
   });
 
   // Embedded Widget Script generator
-  app.get('/embed/script.js', (req, res) => {
+  app.get(['/embed/script.js', '/embed/aria-widget.js', '/aria-widget.js'], (req, res) => {
     const host = req.headers.host || 'localhost:3000';
     const protocol = req.protocol || 'http';
     const script = `

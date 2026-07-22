@@ -37,85 +37,67 @@ export const BentoGridFeatures: React.FC = () => {
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Card 1: IA & RAG Motor (Spans 2 cols on md) */}
-          <div className="md:col-span-2 rounded-3xl bg-slate-900/80 border border-white/10 p-8 relative overflow-hidden group hover:border-emerald-500/30 transition-all flex flex-col justify-between">
+          {/* Card 1: Respuesta Instantánea (<1s) - PDF/Excel RAG */}
+          <div className="md:col-span-2 rounded-3xl bg-white/[0.03] backdrop-blur-sm border border-white/10 p-8 relative overflow-hidden group hover:border-emerald-500/30 transition-all flex flex-col justify-between">
             <div className="space-y-4 relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                 <FileText className="w-6 h-6" />
               </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">
+                  Respuesta Instantánea (&lt;1s)
+                </span>
+                <span className="text-xs text-slate-400">Sincronización RAG</span>
+              </div>
               <h3 className="text-xl font-bold text-white">
-                Comprensión RAG de Planos, Dossieres PDF y Memoria de Calidades
+                La IA conoce todo tu inventario en PDF, Excel y Planos
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
-                Sube las escrituras, planos en PDF o memorias de acabados de tus promociones. El motor Gemini RAG analiza las características exactas y responde dudas sobre metros cuadrados útiles, terrazas, orientación solar y plazas de garaje.
+                Sube las escrituras, listas de precios en Excel, planos en PDF o memorias de acabados de tus propiedades. La IA analiza el inventario en tiempo real para responder con precisión exacta sobre superficies, ubicaciones y precios en USD o moneda local.
               </p>
             </div>
 
             {/* Visual AI Graphic */}
-            <div className="mt-8 p-4 rounded-2xl bg-slate-950 border border-white/10 space-y-3 font-mono text-xs">
+            <div className="mt-8 p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3 font-mono text-xs">
               <div className="flex items-center justify-between text-slate-400 text-[11px]">
                 <span className="flex items-center gap-1.5 text-emerald-400">
-                  <Bot className="w-4 h-4" /> Gemini 3.6 Flash RAG Engine
+                  <Bot className="w-4 h-4" /> Aria Prop / RAG Motor IA
                 </span>
-                <span className="text-emerald-400 font-bold">Documentos Inyectados: 12 PDFs</span>
+                <span className="text-emerald-400 font-bold">Documentos Inyectados: 12 PDFs / Excel</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900 border border-emerald-500/20 text-slate-300">
+              <div className="p-3 rounded-xl bg-black/30 border border-emerald-500/20 text-slate-300">
                 <p className="text-emerald-400 font-semibold mb-1">🔍 Consulta del Cliente:</p>
-                <p className="italic">"¿El chalet de La Moraleja incluye instalación fotovoltaica y cuál es el coste estimado de IBI?"</p>
+                <p className="italic">"¿El departamento en Polanco incluye estacionamiento de visitas y cuál es la cuota de mantenimiento?"</p>
               </div>
               <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200">
-                <p className="font-semibold text-emerald-400 mb-1">⚡ Respuesta Extraída del PDF Dossier:</p>
-                <p>"Sí. Incluye 14 paneles solares de 450W en cubierta. Según el certificado adjunto, el IBI anual es de 2.140€."</p>
+                <p className="font-semibold text-emerald-400 mb-1">⚡ Respuesta Instantánea (0.6s):</p>
+                <p>"Sí. Cuenta con 3 cajones de estacionamiento subterráneos y valet parking para visitas. La cuota mensual es de $4,200 MXN."</p>
               </div>
             </div>
           </div>
 
-          {/* Card 2: Speed Metric < 1 Sec */}
-          <div className="rounded-3xl bg-slate-900/80 border border-white/10 p-8 flex flex-col justify-between hover:border-emerald-500/30 transition-all">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Zap className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Respuesta Ultrarrápida &lt; 1s</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                El 78% de los compradores reservan con la primera agencia que contesta. Tu bot no hace esperar al cliente.
-              </p>
-            </div>
-
-            <div className="mt-8 text-center p-6 rounded-2xl bg-slate-950 border border-emerald-500/20">
-              <div className="text-5xl font-extrabold text-emerald-400 tracking-tight font-mono tabular-nums">
-                0.8s
-              </div>
-              <p className="text-xs text-slate-400 mt-2">Latencia percibida en streaming</p>
-              <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px]">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Atención Ininterrumpida 24/7</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Lead Scoring (Hot, Warm, Cold) */}
-          <div className="rounded-3xl bg-slate-900/80 border border-white/10 p-8 flex flex-col justify-between hover:border-emerald-500/30 transition-all">
+          {/* Card 2: Lead Scoring Automático */}
+          <div className="rounded-3xl bg-white/[0.03] backdrop-blur-sm border border-white/10 p-8 flex flex-col justify-between hover:border-emerald-500/30 transition-all">
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                 <Flame className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-white">Clasificación Automática de Leads</h3>
+              <h3 className="text-xl font-bold text-white">Lead Scoring Automático</h3>
               <p className="text-slate-400 text-sm leading-relaxed">
-                La IA evalúa presupuesto, capacidad financiera y urgencia de compra categorizando cada prospecto en tiempo real.
+                Clasifica automáticamente a los compradores en "Calientes" (con presupuesto inmediato) o "Fríos" para priorizar tu fuerza de ventas.
               </p>
             </div>
 
             <div className="mt-6 space-y-2.5">
-              <div className="p-3 rounded-xl bg-slate-950 border border-red-500/30 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-black/40 border border-red-500/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Flame className="w-4 h-4 text-red-500" />
                   <span className="text-xs font-bold text-white">Lead Caliente (Hot)</span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-300">Score 94/100</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-300">Score 95/100</span>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-amber-500/30 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-black/40 border border-amber-500/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ThermometerSun className="w-4 h-4 text-amber-500" />
                   <span className="text-xs font-bold text-white">Lead Tibio (Warm)</span>
@@ -123,7 +105,7 @@ export const BentoGridFeatures: React.FC = () => {
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">Score 68/100</span>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-blue-500/30 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-black/40 border border-blue-500/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ThermometerSnowflake className="w-4 h-4 text-blue-500" />
                   <span className="text-xs font-bold text-white">Lead Frío (Cold)</span>
@@ -133,31 +115,29 @@ export const BentoGridFeatures: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 4: WhatsApp Business & Integración Omnicanal (Spans 2 cols on md) */}
-          <div className="md:col-span-2 rounded-3xl bg-slate-900/80 border border-white/10 p-8 flex flex-col justify-between hover:border-emerald-500/30 transition-all">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <MessageSquare className="w-6 h-6" />
+          {/* Card 3: Instalación en 2 Minutos */}
+          <div className="md:col-span-3 rounded-3xl bg-white/[0.03] backdrop-blur-sm border border-white/10 p-8 flex flex-col sm:flex-row items-center justify-between gap-6 hover:border-emerald-500/30 transition-all">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-semibold">
+                <Zap className="w-3.5 h-3.5" />
+                <span>Instalación en 2 Minutos</span>
               </div>
-              <h3 className="text-xl font-bold text-white">Conexión con WhatsApp Business & CRM Agencias</h3>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
-                Los mensajes capturados en el widget de tu web o en WhatsApp se envían automáticamente al CRM de la agencia (Salesforce, Idealista Tools, Wasi o HubSpot) notificando a tus asesores humanos.
+              <h3 className="text-2xl font-bold text-white">
+                Un solo script listo para copiar y pegar
+              </h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Compatible al 100% con WordPress, Wix, Webflow, Idealista, TocToc, Properati o sitios en HTML puro. Pégalo antes de la etiqueta <code className="text-emerald-400 font-mono bg-black/40 px-1.5 py-0.5 rounded border border-white/10">&lt;/body&gt;</code> y empieza a recibir leands calientes de inmediato.
               </p>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-              <div className="p-3 rounded-xl bg-slate-950 border border-white/10 text-slate-300 font-semibold">
-                WhatsApp Business API
+            <div className="w-full sm:w-auto p-4 rounded-2xl bg-black/50 border border-emerald-500/30 space-y-2 text-left font-mono text-xs shrink-0">
+              <div className="flex items-center justify-between text-slate-400 text-[10px] pb-2 border-b border-white/5">
+                <span>aria-widget.js</span>
+                <span className="text-emerald-400 font-bold">1 Clic</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-950 border border-white/10 text-slate-300 font-semibold">
-                Idealista Tools Sync
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950 border border-white/10 text-slate-300 font-semibold">
-                Salesforce Real Estate
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950 border border-white/10 text-slate-300 font-semibold">
-                Webhooks Custom
-              </div>
+              <code className="text-emerald-400 block break-all text-[11px]">
+                &lt;script src="https://ariaprop.ai/aria-widget.js" data-agent="agencia-latam"&gt;&lt;/script&gt;
+              </code>
             </div>
           </div>
 

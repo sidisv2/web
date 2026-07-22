@@ -55,6 +55,18 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
           </button>
 
           <button
+            onClick={() => onRouteChange('pricing')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+              currentRoute === 'pricing'
+                ? 'bg-white/10 text-white font-semibold border border-white/10 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Precios & FAQ</span>
+          </button>
+
+          <button
             onClick={() => onRouteChange('dashboard-metrics')}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
               isDashboard && currentRoute !== 'dashboard-checkout'

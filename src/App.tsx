@@ -169,6 +169,11 @@ export default function App() {
           </div>
           <EmbedChatWidget botConfig={botConfig} properties={properties} />
         </div>
+      ) : currentRoute === 'pricing' ? (
+        <main className="flex-1">
+          <PricingSection onRouteChange={setCurrentRoute} />
+          <Footer />
+        </main>
       ) : (
         <main className="flex-1">
           <HeroSection sampleProperties={properties} onRouteChange={setCurrentRoute} />

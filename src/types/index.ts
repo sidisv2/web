@@ -103,6 +103,7 @@ export interface ChatMessage {
 
 export type AppRoute =
   | 'marketing'
+  | 'pricing'
   | 'dashboard-metrics'
   | 'dashboard-properties'
   | 'dashboard-leads'

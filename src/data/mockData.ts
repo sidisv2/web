@@ -10,11 +10,11 @@ export const INITIAL_AGENCY: Agency = {
 
 export const INITIAL_BOT_CONFIG: BotConfig = {
   agentId: 'prop-agent-001',
-  agencyName: 'Aria Prop LATAM',
-  agentName: 'Aria Prop - Asesora IA',
+  agencyName: 'Aria Prop',
+  agentName: 'Aria - Asesora IA',
   avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
   primaryColor: '#10b981',
-  welcomeMessage: '¡Hola! Soy Aria Prop, tu asesora inmobiliaria con IA para Latinoamérica. ¿En qué ciudad, zona o tipo de propiedad estás interesado hoy?',
+  welcomeMessage: '¡Hola! Soy Aria. ¿Buscas comprar, alquilar o información sobre alguna propiedad en particular?',
   fallbackMessage: 'Disculpa, no he comprendido del todo esa consulta. ¿Te gustaría hablar directamente con un asesor humano o agendar una llamada por WhatsApp?',
   whatsappNumber: '+525512345678',
   enableQuickReplies: true,
@@ -25,7 +25,7 @@ export const INITIAL_BOT_CONFIG: BotConfig = {
     '¿Cómo agendar una visita o llamada?'
   ],
   autoScheduleVisits: true,
-  customSystemPrompt: 'Eres "Aria Prop", un agente inmobiliario de inteligencia artificial de alto nivel especializado en bienes raíces en Latinoamérica (México, Colombia, Argentina, Chile, Perú, etc.). Respondes con tono profesional, sofisticado, cálido y directo en español. Tu objetivo principal es cualificar clientes, entender sus presupuestos en USD o moneda local, mostrar los inmuebles del catálogo y agendar visitas presenciales o virtuales por WhatsApp.',
+  customSystemPrompt: 'Eres "Aria", una asesora inmobiliaria de inteligencia artificial de alto nivel para Aria Prop. Respondes con tono profesional, sofisticado, cálido y directo en español. Tu objetivo principal es cualificar clientes, entender sus presupuestos, mostrar inmuebles del catálogo y agendar visitas presenciales o virtuales por WhatsApp.',
   tone: 'luxurious',
 };
 

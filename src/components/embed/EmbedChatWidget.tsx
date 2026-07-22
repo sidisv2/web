@@ -175,7 +175,7 @@ export const EmbedChatWidget: React.FC<EmbedChatWidgetProps> = ({ botConfig, pro
             )}
           </div>
         ))}
-        {isTyping && <p className="text-[10px] text-slate-500 italic">Sofia está analizando el catálogo...</p>}
+        {isTyping && <p className="text-[10px] text-slate-500 italic">Aria está analizando el catálogo...</p>}
         <div ref={chatEndRef} />
       </div>
 

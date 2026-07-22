@@ -46,44 +46,44 @@ interface PlanItem {
 const PLANS: PlanItem[] = [
   {
     id: 'starter',
-    name: 'Aria Starter',
-    priceUsd: 49,
+    name: 'Plan Starter',
+    priceUsd: 39,
     description: 'Ideal para agentes independientes o agencias pequeñas iniciando con IA.',
     features: [
-      '1 Agente IA Aria Prop activo',
-      'Hasta 500 chats de clientes/mes',
-      'Catálogo de hasta 20 propiedades RAG',
+      '1 Agente de IA (Nora AI) activo',
+      'Hasta 500 chats/mes',
+      'Hasta 20 propiedades sincronizadas',
       'Widget Web Embebible',
-      'Notificaciones por Correo'
+      '7 Días de Prueba Gratis (Sin tarjeta)'
     ]
   },
   {
     id: 'pro',
-    name: 'Pro Enterprise LATAM',
-    priceUsd: 149,
-    badge: 'MÁS POPULAR',
-    description: 'Para agencias en crecimiento que buscan automatización total por WhatsApp.',
+    name: 'Plan Pro',
+    priceUsd: 89,
+    badge: 'RECOMENDADO',
+    description: 'Para agencias en crecimiento que buscan automatización total por WhatsApp y CRM.',
     features: [
-      '3 Agentes IA Aria Prop configurables',
-      'Chats y Leads Ilimitados',
-      'Integración Oficial WhatsApp Business',
-      'RAG Documental (Planos, Dossiers, PDFs)',
-      'Human-in-the-Loop (Intervención en Vivo)',
-      'Soporte Prioritario LATAM'
+      '3 Agentes de IA configurables',
+      'Chats y Propiedades Ilimitados',
+      'Sincronización Automática de CRM',
+      'Soporte Prioritario por WhatsApp',
+      'RAG Documental (PDFs, Excel, Planos)',
+      'Intervención en Vivo (Human-in-the-loop)'
     ]
   },
   {
     id: 'agency',
-    name: 'Agencia Unlimited',
-    priceUsd: 299,
-    description: 'Para redes inmobiliarias, desarrolladoras y múltiples sucursales.',
+    name: 'Plan Agency',
+    priceUsd: 199,
+    description: 'Para redes inmobiliarias, franquicias y múltiples sucursales.',
     features: [
-      'Agentes IA Aria Prop Ilimitados',
+      'Agentes de IA Ilimitados',
+      'Marca Blanca (Sin logo de Nora AI)',
+      'Dominio Personalizado',
       'Múltiples sucursales y ciudades',
-      'Integraciones CRM (HubSpot, Salesforce, EasyBroker)',
-      'SLA del 99.9% de disponibilidad',
-      'Gerente de Cuenta Dedicado en Español',
-      'Conexiones API Custom & Webhooks'
+      'Gerente de Cuenta Dedicado',
+      'API Custom & Webhooks'
     ]
   }
 ];

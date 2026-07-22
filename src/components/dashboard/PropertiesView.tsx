@@ -26,6 +26,14 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({ properties, onAd
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [isSyncingAI, setIsSyncingAI] = useState(false);
+
+  const handleSyncAI = () => {
+    setIsSyncingAI(true);
+    setTimeout(() => {
+      setIsSyncingAI(false);
+    }, 1500);
+  };
 
   // Wizard Form State
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
@@ -101,13 +109,24 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({ properties, onAd
           </p>
         </div>
 
-        <button
-          onClick={() => setIsWizardOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Añadir Nueva Propiedad</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSyncAI}
+            disabled={isSyncingAI}
+            className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/10 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <Sparkles className={`w-4 h-4 text-emerald-400 ${isSyncingAI ? 'animate-spin' : ''}`} />
+            <span>{isSyncingAI ? 'Sincronizando...' : 'Sincronizar con IA'}</span>
+          </button>
+
+          <button
+            onClick={() => setIsWizardOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Añadir Nueva Propiedad</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -142,7 +161,24 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({ properties, onAd
 
       {/* Properties Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProperties.map((prop) => (
+        {isSyncingAI
+          ? Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-4 animate-pulse"
+              >
+                <div className="h-44 bg-slate-800 rounded-xl w-full" />
+                <div className="h-4 bg-slate-800 rounded w-3/4" />
+                <div className="h-3 bg-slate-800 rounded w-1/2" />
+                <div className="grid grid-cols-3 gap-2 py-2">
+                  <div className="h-6 bg-slate-800 rounded" />
+                  <div className="h-6 bg-slate-800 rounded" />
+                  <div className="h-6 bg-slate-800 rounded" />
+                </div>
+                <div className="h-10 bg-slate-800 rounded-xl w-full" />
+              </div>
+            ))
+          : filteredProperties.map((prop) => (
           <div
             key={prop.id}
             className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/5 hover:border-emerald-500/30 transition-all overflow-hidden flex flex-col justify-between group"

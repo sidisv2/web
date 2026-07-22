@@ -10,7 +10,7 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'agent'; text: string; property?: Property }>>([
     {
       sender: 'agent',
-      text: '¡Hola! Soy Sofia, la IA comercial de Inmobiliaria Premier. ¿Buscas un chalet con piscina o un ático exclusivo en Madrid?',
+      text: '¡Hola! Soy Aria. ¿Buscas comprar, alquilar o información sobre alguna propiedad en particular?',
     },
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -113,17 +113,20 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
           <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80"
-              alt="Sofia AI"
+              alt="Aria Prop"
               className="w-10 h-10 rounded-full object-cover border-2 border-emerald-400/50"
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full animate-pulse"></span>
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full animate-ping"></span>
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h4 className="text-xs font-bold text-white">Sofia - AI Sales Agent</h4>
+              <h4 className="text-xs font-bold text-white">Habla con Aria | Asesora Inmobiliaria 24/7</h4>
               <Sparkles className="w-3 h-3 text-emerald-400" />
             </div>
-            <p className="text-[10px] text-slate-400">Atención 24/7 • Inmobiliaria Premier</p>
+            <p className="text-[10px] text-slate-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              En línea 24/7 • Sandbox Live
+            </p>
           </div>
         </div>
         <div className="px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-400 font-mono">
@@ -163,7 +166,7 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
                   : 'bg-slate-800/90 text-slate-200 border border-white/10 rounded-tl-none'
               }`}
             >
-              {m.text || (isTyping && idx === messages.length - 1 ? 'Sofia está escribiendo...' : '')}
+              {m.text || (isTyping && idx === messages.length - 1 ? 'Aria está escribiendo...' : '')}
             </div>
 
             {/* Rich Property Card if attached */}

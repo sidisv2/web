@@ -32,6 +32,7 @@ export const LeadsView: React.FC<LeadsViewProps> = ({
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTempFilter, setActiveTempFilter] = useState<'all' | 'hot' | 'warm' | 'cold'>('all');
+  const [isLoadingLeads, setIsLoadingLeads] = useState(false);
   const [activeLeadDrawer, setActiveLeadDrawer] = useState<Lead | null>(
     selectedLeadForChat ? leads.find((l) => l.id === selectedLeadForChat) || null : null
   );
@@ -83,23 +84,36 @@ export const LeadsView: React.FC<LeadsViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-xl border border-white/10 text-xs">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setViewMode('kanban')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              viewMode === 'kanban' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400'
-            }`}
+            onClick={() => {
+              setIsLoadingLeads(true);
+              setTimeout(() => setIsLoadingLeads(false), 1200);
+            }}
+            className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            Vista Kanban
+            <Users className={`w-3.5 h-3.5 text-emerald-400 ${isLoadingLeads ? 'animate-spin' : ''}`} />
+            <span>Refrescar CRM</span>
           </button>
-          <button
-            onClick={() => setViewMode('table')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              viewMode === 'table' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400'
-            }`}
-          >
-            Tabla Lista
-          </button>
+
+          <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-xl border border-white/10 text-xs">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                viewMode === 'kanban' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400'
+              }`}
+            >
+              Vista Kanban
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                viewMode === 'table' ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400'
+              }`}
+            >
+              Tabla Lista
+            </button>
+          </div>
         </div>
       </div>
 
