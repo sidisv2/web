@@ -3,22 +3,37 @@ import { createClient } from '@supabase/supabase-js';
 
 // Environment variables for Supabase
 const env = (import.meta as unknown as { env: Record<string, string> }).env || {};
-const supabaseUrl = env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = (env.VITE_SUPABASE_URL || '').trim();
+const supabaseAnonKey = (env.VITE_SUPABASE_ANON_KEY || '').trim();
 
-// Fallback dummy values to prevent crashes if env vars are missing
+// Fallback dummy values to prevent crashes if env vars are missing or invalid
 const dummyUrl = 'https://placeholder-supabase-project.supabase.co';
 const dummyKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder';
+
+const isValidHttpUrl = (urlStr: string) => {
+  if (!urlStr) return false;
+  try {
+    const parsed = new URL(urlStr);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl && 
   supabaseAnonKey && 
-  supabaseUrl !== 'https://your-supabase-url.supabase.co'
+  supabaseUrl !== 'https://your-supabase-url.supabase.co' &&
+  supabaseUrl !== 'https://your-supabase-project.supabase.co' &&
+  isValidHttpUrl(supabaseUrl)
 );
 
+const validUrl = isSupabaseConfigured && isValidHttpUrl(supabaseUrl) ? supabaseUrl : dummyUrl;
+const validKey = isSupabaseConfigured ? supabaseAnonKey : dummyKey;
+
 export const supabase = createClient(
-  isSupabaseConfigured ? supabaseUrl : dummyUrl,
-  isSupabaseConfigured ? supabaseAnonKey : dummyKey,
+  validUrl,
+  validKey,
   {
     auth: {
       persistSession: true,
