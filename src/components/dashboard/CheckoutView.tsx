@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import {
   CreditCard,
   Building,
@@ -103,6 +104,7 @@ const PLANS: PlanItem[] = [
 ];
 
 export function CheckoutView({ }: CheckoutViewProps) {
+  const { requireAuthForPayment } = useAuth();
   const [selectedPlanId, setSelectedPlanId] = useState<string>('pro');
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'mercadopago' | 'paypal' | 'transfer' | 'crypto'>('mercadopago');
@@ -132,6 +134,22 @@ export function CheckoutView({ }: CheckoutViewProps) {
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
+  const handleOpenCheckoutWithAuth = (planId: string) => {
+    setSelectedPlanId(planId);
+    requireAuthForPayment({
+      planId,
+      onAuthenticated: () => setShowCheckoutModal(true),
+    });
+  };
+
+  const handleOpenPaymentMethodWithAuth = (method: 'card' | 'mercadopago' | 'paypal' | 'transfer' | 'crypto') => {
+    setPaymentMethod(method);
+    requireAuthForPayment({
+      planId: selectedPlanId,
+      onAuthenticated: () => setShowCheckoutModal(true),
+    });
+  };
+
   const handleSimulatePayment = () => {
     setPaymentCompleted(true);
     setTimeout(() => {
@@ -139,6 +157,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
       setPaymentCompleted(false);
     }, 2500);
   };
+
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-10">
@@ -240,8 +259,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSelectedPlanId(plan.id);
-                  setShowCheckoutModal(true);
+                  handleOpenCheckoutWithAuth(plan.id);
                 }}
                 className={`w-full mt-8 py-3 px-4 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
                   isSelected
@@ -279,10 +297,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Mercado Pago */}
           <button
-            onClick={() => {
-              setPaymentMethod('mercadopago');
-              setShowCheckoutModal(true);
-            }}
+            onClick={() => handleOpenPaymentMethodWithAuth('mercadopago')}
             className={`p-5 rounded-2xl border text-left transition-all space-y-3 cursor-pointer ${
               paymentMethod === 'mercadopago'
                 ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500'
@@ -298,10 +313,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
 
           {/* Credit/Debit Card */}
           <button
-            onClick={() => {
-              setPaymentMethod('card');
-              setShowCheckoutModal(true);
-            }}
+            onClick={() => handleOpenPaymentMethodWithAuth('card')}
             className={`p-5 rounded-2xl border text-left transition-all space-y-3 cursor-pointer ${
               paymentMethod === 'card'
                 ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500'
@@ -320,10 +332,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
 
           {/* PayPal */}
           <button
-            onClick={() => {
-              setPaymentMethod('paypal');
-              setShowCheckoutModal(true);
-            }}
+            onClick={() => handleOpenPaymentMethodWithAuth('paypal')}
             className={`p-5 rounded-2xl border text-left transition-all space-y-3 cursor-pointer ${
               paymentMethod === 'paypal'
                 ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500'
@@ -339,10 +348,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
 
           {/* Transfer Bank SPEI / PSE */}
           <button
-            onClick={() => {
-              setPaymentMethod('transfer');
-              setShowCheckoutModal(true);
-            }}
+            onClick={() => handleOpenPaymentMethodWithAuth('transfer')}
             className={`p-5 rounded-2xl border text-left transition-all space-y-3 cursor-pointer ${
               paymentMethod === 'transfer'
                 ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500'
@@ -361,10 +367,7 @@ export function CheckoutView({ }: CheckoutViewProps) {
 
           {/* Crypto Binance */}
           <button
-            onClick={() => {
-              setPaymentMethod('crypto');
-              setShowCheckoutModal(true);
-            }}
+            onClick={() => handleOpenPaymentMethodWithAuth('crypto')}
             className={`p-5 rounded-2xl border text-left transition-all space-y-3 cursor-pointer ${
               paymentMethod === 'crypto'
                 ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500'

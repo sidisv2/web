@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AppRoute } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import {
   Check,
   Sparkles,
@@ -37,9 +38,17 @@ interface PricingSectionProps {
 }
 
 export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange }) => {
+  const { requireAuthForPayment } = useAuth();
   const [isAnnual, setIsAnnual] = useState(true);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [selectedGateway, setSelectedGateway] = useState<string>('all');
+
+  const handlePlanSelection = (planId: string) => {
+    requireAuthForPayment({
+      planId,
+      targetRoute: 'dashboard-checkout',
+    });
+  };
 
   // Pricing calculations with 20% discount on annual
   const starterPrice = isAnnual ? Math.round(39 * 0.8) : 39;
@@ -284,7 +293,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange })
 
             <div className="pt-8">
               <button
-                onClick={() => onRouteChange('dashboard-checkout')}
+                onClick={() => handlePlanSelection('basico')}
                 className="w-full py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-white font-extrabold text-xs border border-white/10 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 shadow-lg"
               >
                 <span>Comenzar Prueba Gratis (7 Días)</span>
@@ -368,7 +377,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange })
 
             <div className="pt-8">
               <button
-                onClick={() => onRouteChange('dashboard-checkout')}
+                onClick={() => handlePlanSelection('profesional')}
                 className="w-full py-4 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/30 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 transform group-hover:scale-[1.02]"
               >
                 <CreditCard className="w-4 h-4" />
@@ -444,7 +453,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange })
 
             <div className="pt-8">
               <button
-                onClick={() => onRouteChange('dashboard-checkout')}
+                onClick={() => handlePlanSelection('enterprise')}
                 className="w-full py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-white font-extrabold text-xs border border-white/10 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 shadow-lg"
               >
                 <span>Elegir Plan Enterprise</span>
@@ -570,7 +579,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange })
             </div>
 
             <button
-              onClick={() => onRouteChange('dashboard-checkout')}
+              onClick={() => handlePlanSelection('profesional')}
               className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer shrink-0"
             >
               <span>Ir a la Pasarela de Pago</span>

@@ -1,0 +1,90 @@
+/// <reference types="vite/client" />
+import { createClient } from '@supabase/supabase-js';
+
+// Environment variables for Supabase
+const env = (import.meta as unknown as { env: Record<string, string> }).env || {};
+const supabaseUrl = env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || '';
+
+// Fallback dummy values to prevent crashes if env vars are missing
+const dummyUrl = 'https://placeholder-supabase-project.supabase.co';
+const dummyKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder';
+
+export const isSupabaseConfigured = Boolean(
+  supabaseUrl && 
+  supabaseAnonKey && 
+  supabaseUrl !== 'https://your-supabase-url.supabase.co'
+);
+
+export const supabase = createClient(
+  isSupabaseConfigured ? supabaseUrl : dummyUrl,
+  isSupabaseConfigured ? supabaseAnonKey : dummyKey,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
+);
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  nombre: string;
+  fecha_registro: string;
+  avatar_url?: string;
+}
+
+/**
+ * Saves or updates user profile in Supabase 'profiles' or 'usuarios' table.
+ */
+export async function saveUserProfile(profile: UserProfile): Promise<{ success: boolean; error?: string }> {
+  if (!isSupabaseConfigured) {
+    // Local storage fallback for seamless testing
+    try {
+      const stored = localStorage.getItem('aria_user_profiles') || '{}';
+      const profilesMap = JSON.parse(stored);
+      profilesMap[profile.id] = profile;
+      localStorage.setItem('aria_user_profiles', JSON.stringify(profilesMap));
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  try {
+    // Try saving to 'profiles' table first
+    const { error: errorProfiles } = await supabase
+      .from('profiles')
+      .upsert({
+        id: profile.id,
+        email: profile.email,
+        nombre: profile.nombre,
+        fecha_registro: profile.fecha_registro,
+        avatar_url: profile.avatar_url,
+      }, { onConflict: 'id' });
+
+    if (errorProfiles) {
+      // Fallback try 'usuarios' table
+      const { error: errorUsuarios } = await supabase
+        .from('usuarios')
+        .upsert({
+          id: profile.id,
+          email: profile.email,
+          nombre: profile.nombre,
+          fecha_registro: profile.fecha_registro,
+          avatar_url: profile.avatar_url,
+        }, { onConflict: 'id' });
+
+      if (errorUsuarios) {
+        console.warn('Could not save to profiles or usuarios table in Supabase:', errorUsuarios.message);
+        return { success: false, error: errorUsuarios.message };
+      }
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}

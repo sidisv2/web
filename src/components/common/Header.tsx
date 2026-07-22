@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppRoute } from '../../types';
 import { RealtimeDot } from './RealtimeDot';
+import { useAuth } from '../../context/AuthContext';
 import { 
   Building2, 
   LayoutDashboard, 
@@ -8,7 +9,10 @@ import {
   Code, 
   Sparkles,
   CreditCard,
-  ArrowRight
+  ArrowRight,
+  LogOut,
+  User as UserIcon,
+  LogIn
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -19,6 +23,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, agencyName = 'Aria Prop LATAM' }) => {
   const isDashboard = currentRoute.startsWith('dashboard');
+  const { user, signOut, openAuthModal } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-black/20 backdrop-blur-md border-b border-white/5 transition-all">
@@ -103,32 +108,56 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
           </button>
         </nav>
 
-        {/* Right Action Bar */}
+        {/* Right Action Bar - User State */}
         <div className="flex items-center gap-3">
           <RealtimeDot className="hidden lg:inline-flex" />
 
-          {isDashboard ? (
-            <div className="flex items-center gap-2 pl-2 border-l border-white/10">
-              <div className="text-right hidden sm:block">
-                <p className="text-xs font-semibold text-white">{agencyName}</p>
-                <p className="text-[10px] text-emerald-400">Pro LATAM Activo</p>
+          {user ? (
+            <div className="flex items-center gap-2.5 pl-2 border-l border-white/10">
+              <div className="flex items-center gap-2">
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.nombre}
+                    className="w-8 h-8 rounded-full border border-emerald-500/50 object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                    {user.nombre.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="text-left hidden sm:block">
+                  <p className="text-xs font-bold text-white max-w-[120px] truncate">{user.nombre}</p>
+                  <p className="text-[10px] text-emerald-400">Sesión Activa</p>
+                </div>
               </div>
+
               <button
-                onClick={() => onRouteChange('dashboard-bot-config')}
-                className="p-2 rounded-lg bg-slate-900 border border-white/10 text-slate-300 hover:text-white hover:border-emerald-500/40 transition-all cursor-pointer"
-                title="Configuración del Bot Aria Prop"
+                onClick={signOut}
+                className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/20 hover:text-rose-400 border border-white/10 text-slate-300 text-xs transition-all flex items-center gap-1 cursor-pointer"
+                title="Cerrar Sesión"
               >
-                <Sliders className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Salir</span>
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => onRouteChange('dashboard-metrics')}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-semibold text-xs transition-all shadow-lg shadow-emerald-500/25 flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>Acceder al Dashboard</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => openAuthModal('login')}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <LogIn className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Ingresar</span>
+              </button>
+
+              <button
+                onClick={() => openAuthModal('signup')}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1 cursor-pointer"
+              >
+                <span>Registrarse</span>
+              </button>
+            </div>
           )}
         </div>
 
@@ -136,3 +165,4 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
     </header>
   );
 };
+

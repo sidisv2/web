@@ -1,6 +1,7 @@
 import React from 'react';
 import { InteractiveSandboxWidget } from './InteractiveSandboxWidget';
 import { Property, AppRoute } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck, Zap, MessageSquare } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -9,6 +10,15 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ sampleProperties, onRouteChange }) => {
+  const { requireAuthForPayment } = useAuth();
+
+  const handleStartFreeTrial = () => {
+    requireAuthForPayment({
+      planId: 'pro',
+      targetRoute: 'dashboard-checkout',
+    });
+  };
+
   return (
     <section className="relative pt-12 pb-20 overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       
@@ -45,7 +55,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ sampleProperties, onRo
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button
-                onClick={() => onRouteChange('dashboard-metrics')}
+                onClick={handleStartFreeTrial}
                 className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Probar 7 Días Gratis</span>
