@@ -1,7 +1,9 @@
+// Reemplaza el contenido del componente EmbedChatWidget actual por esta versión
 import React, { useState, useRef, useEffect } from 'react';
 import { Property, BotConfig } from '../../types';
-import { Send, Bot, Sparkles, MapPin, Calendar, X } from 'lucide-react';
-import { PaywallModal } from '../chat/PaywallModal';
+import { Send, Bot } from 'lucide-react';
+import PaywallModal from '../chat/PaywallModal';
+import { supabase } from '../../lib/supabaseClient';
 import { TwitterActionCard } from '../marketing/TwitterActionCard';
 
 interface EmbedChatWidgetProps {
@@ -11,42 +13,64 @@ interface EmbedChatWidgetProps {
 
 export const EmbedChatWidget: React.FC<EmbedChatWidgetProps> = ({ botConfig, properties }) => {
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'agent'; text: string; property?: Property }>>([
-    {
-      sender: 'agent',
-      text: botConfig.welcomeMessage || '¡Hola! Soy Aria. ¿En qué puedo ayudarte hoy?',
-    },
+    { sender: 'agent', text: botConfig.welcomeMessage || '¡Hola! Soy Aria. ¿En qué puedo ayudarte hoy?' },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [inputDisabled, setInputDisabled] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize sent free message state from localStorage
-  const [hasSentFreeMessage, setHasSentFreeMessage] = useState<boolean>(() => {
-    return localStorage.getItem('hasSentFreeMessage') === 'true';
-  });
+  // Track sent messages count in localStorage
+  const getSentCount = () => {
+    try { return parseInt(localStorage.getItem('sent_messages_count') || '0', 10); } catch { return 0; }
+  };
+  const setSentCount = (v: number) => { try { localStorage.setItem('sent_messages_count', String(v)); } catch {} };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  // Check Supabase profile to allow bypass if plan_activo
+  const checkUserPlanActive = async () => {
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData?.session?.user;
+      if (!user) return false;
+      const { data: profiles } = await supabase.from('profiles').select('estado_cuenta,trial_ends_at').eq('id', user.id).single();
+      const estado = (profiles as any)?.estado_cuenta;
+      if (estado === 'plan_activo') return true;
+      if (estado === 'prueba_7dias' || (profiles as any)?.trial_ends_at) {
+        const t = (profiles as any)?.trial_ends_at;
+        if (t && new Date(t) > new Date()) return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSend = async (text?: string) => {
     const textToSend = text || inputValue;
     if (!textToSend.trim()) return;
 
-    // RULE 4: 1 Free Message limit. If already sent, show paywall modal
-    if (hasSentFreeMessage) {
-      setShowPaywall(true);
-      return;
+    // If user has active plan, allow sending unlimited
+    const isPlanActive = await checkUserPlanActive();
+    if (!isPlanActive) {
+      const sent = getSentCount();
+      if (sent >= 1) {
+        // block, show subscription modal
+        setInputDisabled(true);
+        setShowPaywall(true);
+        return;
+      }
+      setSentCount(sent + 1);
     }
 
-    // Mark as sent
-    setHasSentFreeMessage(true);
-    localStorage.setItem('hasSentFreeMessage', 'true');
-
-    const newMessages = [...messages, { sender: 'user' as const, text: textToSend }];
+    // proceed sending
+    const newMessages = [...messages, { sender: 'user', text: textToSend }];
     setMessages(newMessages);
-    if (!text) setInputValue('');
+    setInputValue('');
     setIsTyping(true);
 
     try {
@@ -68,51 +92,23 @@ export const EmbedChatWidget: React.FC<EmbedChatWidgetProps> = ({ botConfig, pro
       const decoder = new TextDecoder();
       let fullText = '';
 
-      const matchedProp = properties.find((p) =>
-        textToSend.toLowerCase().includes(p.location.city.toLowerCase()) ||
-        textToSend.toLowerCase().includes(p.type) ||
-        textToSend.toLowerCase().includes('chalet') ||
-        textToSend.toLowerCase().includes('lujo')
-      );
-
-      setMessages((prev) => [...prev, { sender: 'agent', text: '', property: matchedProp }]);
+      // Add placeholder agent response (streaming will update it)
+      setMessages((prev) => [...prev, { sender: 'agent', text: '', property: undefined }]);
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\n\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.replace('data: ', ''));
-              if (data.text) {
-                fullText += data.text;
-                setMessages((prev) => {
-                  const updated = [...prev];
-                  const last = updated[updated.length - 1];
-                  if (last && last.sender === 'agent') {
-                    last.text = fullText;
-                  }
-                  return updated;
-                });
-              }
-            } catch {
-              // chunk parse ignore
-            }
-          }
-        }
+        fullText += chunk;
+        setMessages((prev) => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last && last.sender === 'agent') last.text = fullText;
+          return updated;
+        });
       }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: 'agent',
-          text: 'Con mucho gusto te asesoro. Te recomiendo consultar nuestro Chalet de Lujo en La Moraleja.',
-          property: properties[0],
-        },
-      ]);
+      setMessages((prev) => [...prev, { sender: 'agent', text: 'Lo siento, hubo un error procesando la respuesta.' }]);
     } finally {
       setIsTyping(false);
     }
@@ -120,114 +116,69 @@ export const EmbedChatWidget: React.FC<EmbedChatWidgetProps> = ({ botConfig, pro
 
   return (
     <div className="w-full max-w-xl mx-auto space-y-4">
-      {/* Twitter / X High-Impact CTA Widget Card */}
+      {/* CTA card hacia Twitter/X */}
       <TwitterActionCard onSelectPrompt={(prompt) => handleSend(prompt)} />
 
-      {/* Main Embedded Chat Card */}
-      <div className="w-full h-[580px] rounded-3xl bg-slate-900/95 border border-emerald-500/30 shadow-2xl overflow-hidden flex flex-col backdrop-blur-2xl">
-        
-        {/* Header */}
-        <div
-          className="p-4 text-slate-950 font-bold flex items-center justify-between shadow-md"
-          style={{ backgroundColor: botConfig.primaryColor || '#10b981' }}
-        >
+      {/* Chat container (principal) */}
+      <div className="chat-container rounded-3xl overflow-hidden flex flex-col">
+        <div className="chat-header p-4" style={{ backgroundColor: botConfig.primaryColor || '#10b981' }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-slate-950/20 border border-slate-950/30 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-slate-950" />
+            <div className="avatar">
+              <Bot />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold leading-tight">{botConfig.agentName || 'Aria Prop IA'}</h4>
-              <p className="text-[10px] opacity-85">{botConfig.agencyName || 'Agencia Inmobiliaria'}</p>
+              <h4 className="font-bold">{botConfig.agentName || 'Aria Prop IA'}</h4>
+              <p className="text-xs">{botConfig.agencyName}</p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-slate-950/20 text-slate-950 text-[10px] font-mono font-bold">
-              Widget Embebido
-            </span>
+            <div className="ml-auto badge">Widget Embebido</div>
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs font-sans">
+        <div className="chat-messages p-4 overflow-y-auto flex-1">
           {messages.map((m, idx) => (
-            <div key={idx} className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}>
-              <div
-                className={`max-w-[85%] p-3 rounded-2xl leading-relaxed ${
-                  m.sender === 'user'
-                    ? 'bg-emerald-600 text-white rounded-tr-none'
-                    : 'bg-white/[0.04] text-slate-200 border border-white/5 rounded-tl-none'
-                }`}
-              >
-                {m.text || (isTyping && idx === messages.length - 1 ? 'Escribiendo...' : '')}
-              </div>
-
+            <div key={idx} className={`message ${m.sender === 'user' ? 'user' : 'agent'}`}>
+              <div className="bubble">{m.text}</div>
               {m.property && (
-                <div className="mt-2 max-w-[90%] p-3 rounded-xl bg-black/40 border border-emerald-500/30 space-y-2">
-                  <img
-                    src={m.property.images[0]}
-                    alt={m.property.title}
-                    className="w-full h-24 object-cover rounded-xl"
-                  />
-                  <p className="font-semibold text-white text-xs truncate">{m.property.title}</p>
-                  <p className="text-[10px] text-emerald-400 font-mono font-bold">
-                    {m.property.price.toLocaleString('es-ES')} €
-                  </p>
-                  <button
-                    onClick={() => handleSend(`Deseo solicitar cita para la propiedad ${m.property?.code}`)}
-                    className="w-full py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-semibold text-[11px] border border-emerald-500/30"
-                  >
-                    Agendar Cita
-                  </button>
+                <div className="prop-card">
+                  <img src={m.property.images[0]} alt={m.property.title} />
+                  <div>{m.property.title}</div>
                 </div>
               )}
             </div>
           ))}
-          {isTyping && <p className="text-[10px] text-slate-500 italic">Aria está analizando el catálogo...</p>}
+          {isTyping && <div className="typing">Aria está escribiendo...</div>}
           <div ref={chatEndRef} />
         </div>
 
-        {/* Quick replies */}
-        {botConfig.enableQuickReplies && botConfig.quickReplies && (
-          <div className="p-2 bg-black/40 border-t border-white/5 flex gap-1.5 overflow-x-auto no-scrollbar text-[10px]">
-            {botConfig.quickReplies.map((qr, i) => (
-              <button
-                key={i}
-                onClick={() => handleSend(qr)}
-                className="shrink-0 px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 hover:text-white border border-white/5 cursor-pointer"
-              >
-                {qr}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Input */}
-        <div className="p-3 bg-black/40 border-t border-white/5 flex items-center gap-2">
+        <div className="chat-input p-3 border-t">
           <input
             type="text"
+            disabled={inputDisabled}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Escribe tu idea o consulta de tu proyecto..."
-            className="flex-1 bg-black/30 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all"
+            placeholder="Escribe tu consulta..."
+            className="input"
           />
-          <button
-            onClick={() => handleSend()}
-            className="p-2.5 rounded-xl text-slate-950 font-bold transition-all cursor-pointer"
-            style={{ backgroundColor: botConfig.primaryColor || '#10b981' }}
-          >
-            <Send className="w-4 h-4" />
+          <button onClick={() => handleSend()} className="send-btn" disabled={inputDisabled}>
+            <Send />
           </button>
         </div>
-
       </div>
 
-      {/* Paywall Modal */}
       <PaywallModal
         isOpen={showPaywall}
-        onClose={() => setShowPaywall(false)}
+        onClose={() => {
+          setShowPaywall(false);
+          setInputDisabled(false);
+        }}
+        onSubscriptionActivated={() => {
+          setSentCount(0);
+          setInputDisabled(false);
+        }}
       />
     </div>
   );
 };
+
+export default EmbedChatWidget;
