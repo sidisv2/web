@@ -28,20 +28,25 @@ export const isSupabaseConfigured = Boolean(
   isValidHttpUrl(supabaseUrl)
 );
 
-const validUrl = isSupabaseConfigured && isValidHttpUrl(supabaseUrl) ? supabaseUrl : dummyUrl;
-const validKey = isSupabaseConfigured ? supabaseAnonKey : dummyKey;
+let _supabase: ReturnType<typeof createClient> | null = null;
+try {
+  const validUrl = isSupabaseConfigured && isValidHttpUrl(supabaseUrl) ? supabaseUrl : dummyUrl;
+  const validKey = isSupabaseConfigured ? supabaseAnonKey : dummyKey;
 
-export const supabase = createClient(
-  validUrl,
-  validKey,
-  {
+  _supabase = createClient(validUrl, validKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
     },
-  }
-);
+  });
+} catch (err) {
+  // eslint-disable-next-line no-console
+  console.warn('Supabase client initialization failed, falling back to mock. Error:', err);
+  _supabase = null as any;
+}
+
+export const supabase = _supabase as any;
 
 export interface UserProfile {
   id: string;
@@ -58,7 +63,7 @@ export interface UserProfile {
  * Gets user profile from Supabase 'profiles' or 'usuarios' table or localStorage.
  */
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured || !supabase) {
     try {
       const stored = localStorage.getItem('aria_user_profiles') || '{}';
       const profilesMap = JSON.parse(stored);
@@ -76,7 +81,9 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     if (uData) return uData as UserProfile;
 
     return null;
-  } catch {
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('getUserProfile error', e);
     return null;
   }
 }
@@ -85,7 +92,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
  * Saves or updates user profile in Supabase 'profiles' or 'usuarios' table.
  */
 export async function saveUserProfile(profile: UserProfile): Promise<{ success: boolean; error?: string }> {
-  if (!isSupabaseConfigured) {
+  if (!isSupabaseConfigured || !supabase) {
     // Local storage fallback for seamless testing
     try {
       const stored = localStorage.getItem('aria_user_profiles') || '{}';
@@ -99,7 +106,7 @@ export async function saveUserProfile(profile: UserProfile): Promise<{ success: 
   }
 
   try {
-    const payload = {
+    const payload: any = {
       id: profile.id,
       email: profile.email,
       nombre: profile.nombre,
@@ -122,6 +129,7 @@ export async function saveUserProfile(profile: UserProfile): Promise<{ success: 
         .upsert(payload, { onConflict: 'id' });
 
       if (errorUsuarios) {
+        // eslint-disable-next-line no-console
         console.warn('Could not save to profiles or usuarios table in Supabase:', errorUsuarios.message);
         return { success: false, error: errorUsuarios.message };
       }
