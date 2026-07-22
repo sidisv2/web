@@ -1,5 +1,6 @@
 import React from 'react';
 import { InteractiveSandboxWidget } from './InteractiveSandboxWidget';
+import { TwitterActionCard } from './TwitterActionCard';
 import { Property, AppRoute } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck, Zap, MessageSquare } from 'lucide-react';
@@ -90,9 +91,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ sampleProperties, onRo
           </div>
 
           {/* Right Column: Interactive Live Widget Sandbox */}
-          <div className="lg:col-span-5 relative">
-            <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-emerald-500 to-teal-500 opacity-20 blur-xl"></div>
-            <InteractiveSandboxWidget sampleProperties={sampleProperties} />
+          <div className="lg:col-span-5 relative space-y-4">
+            <TwitterActionCard />
+            <div className="relative">
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-emerald-500 to-teal-500 opacity-20 blur-xl"></div>
+              <InteractiveSandboxWidget sampleProperties={sampleProperties} />
+            </div>
           </div>
 
         </div>

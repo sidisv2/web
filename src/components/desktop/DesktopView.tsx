@@ -97,9 +97,9 @@ export const DesktopView: React.FC<DesktopViewProps> = ({
       ) : currentRoute === 'embed-preview' ? (
         <div className="flex-1 p-8 max-w-4xl mx-auto space-y-6 text-center">
           <div className="p-8 rounded-3xl bg-slate-900 border border-emerald-500/30 space-y-4">
-            <h2 className="text-2xl font-bold text-white">Vista Previa del Widget Embebible Flotante (PC)</h2>
+            <h2 className="text-2xl font-bold text-white">Interfaz del Widget Embebible</h2>
             <p className="text-xs text-slate-400 max-w-xl mx-auto">
-              El widget abajo a la derecha es exactamente lo que verán tus visitantes en escritorio. Interactúa con él en directo con respuestas RAG simuladas o Gemini Flash.
+              Chatea directamente con nuestra IA comercial integrada en la tarjeta del widget. Muestra tu catálogo, cualifica leads y analiza ideas en tiempo real.
             </p>
           </div>
           <EmbedChatWidget botConfig={botConfig} properties={properties} />
@@ -117,11 +117,6 @@ export const DesktopView: React.FC<DesktopViewProps> = ({
           <PricingSection onRouteChange={onRouteChange} />
           <Footer />
         </main>
-      )}
-
-      {/* Floating Chat Widget across all pages for testing */}
-      {currentRoute !== 'embed-preview' && (
-        <EmbedChatWidget botConfig={botConfig} properties={properties} />
       )}
 
       {/* Desktop Centered Popup Modal */}

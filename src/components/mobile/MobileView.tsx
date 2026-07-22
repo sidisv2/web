@@ -102,9 +102,9 @@ export const MobileView: React.FC<MobileViewProps> = ({
         {currentRoute === 'embed-preview' && (
           <div className="p-4 space-y-4 text-center">
             <div className="p-5 bg-slate-900 border border-emerald-500/30 rounded-2xl space-y-2">
-              <h2 className="text-base font-bold text-white">Vista Previa Widget Flotante</h2>
+              <h2 className="text-base font-bold text-white">Widget Embebible de IA</h2>
               <p className="text-xs text-slate-400">
-                El chatbot está activo en la esquina inferior derecha. Prueba enviarle preguntas.
+                Chatea con nuestra IA en tiempo real. Escribe tus dudas y consulta información del catálogo.
               </p>
             </div>
             <EmbedChatWidget botConfig={botConfig} properties={properties} />
@@ -125,11 +125,6 @@ export const MobileView: React.FC<MobileViewProps> = ({
           </div>
         )}
       </main>
-
-      {/* Floating Chatbot Widget on non-preview screens */}
-      {currentRoute !== 'embed-preview' && (
-        <EmbedChatWidget botConfig={botConfig} properties={properties} />
-      )}
 
       {/* Mobile Fixed Bottom Navigation Bar */}
       <MobileBottomNav

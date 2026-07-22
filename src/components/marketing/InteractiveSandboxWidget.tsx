@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles, Building2, MapPin, Calendar, CheckCircle2 } from 'lucide-react';
 import { Property } from '../../types';
+import { PaywallModal } from '../chat/PaywallModal';
 
 interface InteractiveSandboxWidgetProps {
   sampleProperties: Property[];
@@ -15,7 +16,13 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize sent free message state from localStorage
+  const [hasSentFreeMessage, setHasSentFreeMessage] = useState<boolean>(() => {
+    return localStorage.getItem('hasSentFreeMessage') === 'true';
+  });
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -24,6 +31,16 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
   const handleSend = async (customPrompt?: string) => {
     const textToSend = customPrompt || inputValue;
     if (!textToSend.trim()) return;
+
+    // RULE 4: Restrict to 1 free message. If user already sent a free message, block 2nd message & show PaywallModal
+    if (hasSentFreeMessage) {
+      setShowPaywall(true);
+      return;
+    }
+
+    // Mark as sent free message
+    setHasSentFreeMessage(true);
+    localStorage.setItem('hasSentFreeMessage', 'true');
 
     // Add user message
     const newMessages = [...messages, { sender: 'user' as const, text: textToSend }];
@@ -85,7 +102,7 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
                 });
               }
             } catch {
-              // ignore parse errors for partial chunks
+              // ignore parse errors
             }
           }
         }
@@ -237,6 +254,12 @@ export const InteractiveSandboxWidget: React.FC<InteractiveSandboxWidgetProps> =
           <Send className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Paywall Conversion Modal */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
 
     </div>
   );

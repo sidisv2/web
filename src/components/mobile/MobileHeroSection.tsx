@@ -2,6 +2,8 @@ import React from 'react';
 import { Property, AppRoute } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { Sparkles, ArrowRight, ShieldCheck, Zap, MessageSquare, Building2, Play } from 'lucide-react';
+import { TwitterActionCard } from '../marketing/TwitterActionCard';
+import { InteractiveSandboxWidget } from '../marketing/InteractiveSandboxWidget';
 
 interface MobileHeroSectionProps {
   sampleProperties: Property[];
@@ -48,14 +50,12 @@ export const MobileHeroSection: React.FC<MobileHeroSectionProps> = ({ sampleProp
           <span>Probar 7 Días Gratis</span>
           <ArrowRight className="w-4 h-4" />
         </button>
+      </div>
 
-        <button
-          onClick={() => onRouteChange('embed-preview')}
-          className="w-full py-3 px-4 rounded-xl bg-slate-900 border border-white/10 text-white font-bold text-xs active:scale-98 transition-transform flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <Play className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Probar Chatbot Flotante</span>
-        </button>
+      {/* Twitter Action Card + Interactive Chat */}
+      <div className="space-y-3 pt-2">
+        <TwitterActionCard />
+        <InteractiveSandboxWidget sampleProperties={sampleProperties} />
       </div>
 
       {/* Quick Mobile Stats Strip */}
