@@ -8,6 +8,15 @@
     <!-- Use base href to ensure relative paths resolve properly on subroutes -->
     <base href="/" />
 
+    <!-- Tailwind CDN (runtime) - emergency: provides utility classes if build-step failed to inject CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome (icons fallback) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p1Cm3bKZ6qH2q2qz+q2b8V6dQGd2f1q5ZzV3d6k9s7e4G5f1h2j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Lucide icons CDN (fallback) -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
+
     <!-- Primary stylesheet (relative path to source CSS for emergency/static serving) -->
     <link rel="stylesheet" href="./src/index.css" />
 
@@ -24,12 +33,35 @@
       /* Ensure clickable elements show pointer */
       button,a,input[type="submit"],input[type="button"],.btn,[role="button"],.clickable{cursor:pointer!important}
 
-      /* Minimal modal overlay styling to ensure modals are visible */
-      .modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-      .modal-card{width:100%;max-width:520px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px}
+      /* Button basic reset */
+      button, .btn {appearance:none;border:none;padding:8px 12px;border-radius:8px;background:#10b981;color:#05201a;font-weight:700}
 
-      /* Basic accessibility helpers */
-      .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+      /* Minimal layout helpers used by the app (fallbacks if Tailwind isn't applied) */
+      .flex{display:flex}
+      .flex-col{flex-direction:column}
+      .items-center{align-items:center}
+      .justify-center{justify-content:center}
+      .flex-1{flex:1}
+      .gap-3{gap:0.75rem}
+      .p-4{padding:1rem}
+      .rounded-3xl{border-radius:1.5rem}
+      .overflow-hidden{overflow:hidden}
+      .mx-auto{margin-left:auto;margin-right:auto}
+      .max-w-xl{max-width:36rem}
+      .space-y-4 > * + *{margin-top:1rem}
+      .min-h-screen{min-height:100vh}
+
+      /* Chat-specific fallback styles to keep layout readable */
+      .chat-container{display:flex;flex-direction:column;background:linear-gradient(180deg,#0b1220,#07080a);border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+      .chat-header{padding:12px;background:#0f766e;color:#e6f9f2}
+      .chat-messages{padding:12px;overflow-y:auto;flex:1}
+      .chat-input{padding:12px;border-top:1px solid rgba(255,255,255,0.04);display:flex;gap:8px}
+      .input{flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:#e6eef7}
+      .send-btn{background:#10b981;color:#05201a;border-radius:10px;padding:10px;border:none}
+      .message{margin-bottom:10px}
+      .message .bubble{display:inline-block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03)}
+      .message.user .bubble{background:#10b981;color:#05201a}
+      .typing{opacity:0.86;font-style:italic}
     </style>
 
   </head>
