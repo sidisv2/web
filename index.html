@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aria Prop - Agentes de IA para el Sector Inmobiliario</title>
     <meta name="description" content="Automatiza la atención de tus inmuebles, cualifica leads y agenda visitas 24/7 con Aria Prop." />
+    <!-- Use base href to ensure relative paths resolve properly on subroutes -->
+    <base href="/" />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- Use relative path to avoid accidental absolute-path issues when deployed under a subroute -->
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
-
