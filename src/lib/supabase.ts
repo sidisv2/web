@@ -49,6 +49,36 @@ export interface UserProfile {
   nombre: string;
   fecha_registro: string;
   avatar_url?: string;
+  estado_cuenta?: 'gratis' | 'prueba_activa' | 'pro_basico' | 'plan_activo';
+  plan_id?: string;
+  fecha_fin_prueba?: string;
+}
+
+/**
+ * Gets user profile from Supabase 'profiles' or 'usuarios' table or localStorage.
+ */
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  if (!isSupabaseConfigured) {
+    try {
+      const stored = localStorage.getItem('aria_user_profiles') || '{}';
+      const profilesMap = JSON.parse(stored);
+      return profilesMap[userId] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  try {
+    const { data: pData } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+    if (pData) return pData as UserProfile;
+
+    const { data: uData } = await supabase.from('usuarios').select('*').eq('id', userId).maybeSingle();
+    if (uData) return uData as UserProfile;
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -60,7 +90,7 @@ export async function saveUserProfile(profile: UserProfile): Promise<{ success: 
     try {
       const stored = localStorage.getItem('aria_user_profiles') || '{}';
       const profilesMap = JSON.parse(stored);
-      profilesMap[profile.id] = profile;
+      profilesMap[profile.id] = { ...profilesMap[profile.id], ...profile };
       localStorage.setItem('aria_user_profiles', JSON.stringify(profilesMap));
       return { success: true };
     } catch (e: any) {
@@ -69,28 +99,27 @@ export async function saveUserProfile(profile: UserProfile): Promise<{ success: 
   }
 
   try {
+    const payload = {
+      id: profile.id,
+      email: profile.email,
+      nombre: profile.nombre,
+      fecha_registro: profile.fecha_registro,
+      avatar_url: profile.avatar_url,
+      ...(profile.estado_cuenta ? { estado_cuenta: profile.estado_cuenta } : {}),
+      ...(profile.plan_id ? { plan_id: profile.plan_id } : {}),
+      ...(profile.fecha_fin_prueba ? { fecha_fin_prueba: profile.fecha_fin_prueba } : {}),
+    };
+
     // Try saving to 'profiles' table first
     const { error: errorProfiles } = await supabase
       .from('profiles')
-      .upsert({
-        id: profile.id,
-        email: profile.email,
-        nombre: profile.nombre,
-        fecha_registro: profile.fecha_registro,
-        avatar_url: profile.avatar_url,
-      }, { onConflict: 'id' });
+      .upsert(payload, { onConflict: 'id' });
 
     if (errorProfiles) {
       // Fallback try 'usuarios' table
       const { error: errorUsuarios } = await supabase
         .from('usuarios')
-        .upsert({
-          id: profile.id,
-          email: profile.email,
-          nombre: profile.nombre,
-          fecha_registro: profile.fecha_registro,
-          avatar_url: profile.avatar_url,
-        }, { onConflict: 'id' });
+        .upsert(payload, { onConflict: 'id' });
 
       if (errorUsuarios) {
         console.warn('Could not save to profiles or usuarios table in Supabase:', errorUsuarios.message);
