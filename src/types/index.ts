@@ -109,7 +109,29 @@ export type AppRoute =
   | 'dashboard-leads'
   | 'dashboard-bot-config'
   | 'dashboard-checkout'
+  | 'dashboard-profile'
+  | 'dashboard-files'
   | 'embed-preview';
+
+export interface UserFile {
+  id: string;
+  userId: string;
+  name: string;
+  sizeBytes: number;
+  type: 'image' | 'pdf' | 'document' | 'other';
+  mimeType: string;
+  url: string;
+  uploadedAt: string;
+  storagePath: string;
+}
+
+export interface UserPreferences {
+  theme: 'dark' | 'light' | 'system';
+  language: 'es' | 'en' | 'pt';
+  notificationsEmail: boolean;
+  notificationsWhatsapp: boolean;
+  defaultCurrency: 'USD' | 'MXN' | 'COP' | 'ARS' | 'CLP';
+}
 
 export interface PaymentLinkConfig {
   planId: string;

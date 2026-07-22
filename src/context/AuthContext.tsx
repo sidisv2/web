@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, saveUserProfile, UserProfile } from '../lib/supabase';
-import { AppRoute } from '../types';
+import { AppRoute, UserPreferences } from '../types';
 
 export interface AppUser {
   id: string;
@@ -11,10 +11,19 @@ export interface AppUser {
   createdAt: string;
 }
 
+const DEFAULT_PREFERENCES: UserPreferences = {
+  theme: 'dark',
+  language: 'es',
+  notificationsEmail: true,
+  notificationsWhatsapp: true,
+  defaultCurrency: 'USD',
+};
+
 interface AuthContextType {
   user: AppUser | null;
   session: Session | null;
   loading: boolean;
+  userPreferences: UserPreferences;
   authModalOpen: boolean;
   modalTab: 'login' | 'signup';
   pendingPlan: string | null;
@@ -23,6 +32,8 @@ interface AuthContextType {
   signIn: (data: { email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   signInWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  updateUserProfile: (updates: { nombre?: string; avatarUrl?: string }) => Promise<{ success: boolean; error?: string }>;
+  updateUserPreferences: (prefs: Partial<UserPreferences>) => void;
   requireAuthForPayment: (options?: { planId?: string; targetRoute?: AppRoute; onAuthenticated?: () => void }) => boolean;
   openAuthModal: (tab?: 'login' | 'signup', planId?: string, targetRoute?: AppRoute) => void;
   closeAuthModal: () => void;
@@ -31,6 +42,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_SESSION_KEY = 'aria_prop_mock_session_user';
+const LOCAL_STORAGE_PREFS_KEY = 'aria_user_preferences';
 
 export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (route: AppRoute) => void }> = ({
   children,
@@ -39,6 +51,75 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
   const [user, setUser] = useState<AppUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_PREFS_KEY);
+      return stored ? { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) } : DEFAULT_PREFERENCES;
+    } catch {
+      return DEFAULT_PREFERENCES;
+    }
+  });
+
+  // Save preferences changes to localStorage
+  const updateUserPreferences = (prefs: Partial<UserPreferences>) => {
+    setUserPreferences((prev) => {
+      const updated = { ...prev, ...prefs };
+      try {
+        localStorage.setItem(LOCAL_STORAGE_PREFS_KEY, JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Error saving preferences:', e);
+      }
+      return updated;
+    });
+  };
+
+  // Update user profile function (nombre, avatar)
+  const updateUserProfile = async (updates: { nombre?: string; avatarUrl?: string }): Promise<{ success: boolean; error?: string }> => {
+    if (!user) return { success: false, error: 'Usuario no autenticado' };
+
+    const updatedUser: AppUser = {
+      ...user,
+      nombre: updates.nombre !== undefined ? updates.nombre : user.nombre,
+      avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : user.avatarUrl,
+    };
+
+    setUser(updatedUser);
+
+    // Persist in local storage session
+    try {
+      localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(updatedUser));
+    } catch (e) {
+      console.warn('Could not update local storage user session:', e);
+    }
+
+    // Save to Supabase profile table
+    const profile: UserProfile = {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      nombre: updatedUser.nombre,
+      fecha_registro: updatedUser.createdAt,
+      avatar_url: updatedUser.avatarUrl,
+    };
+
+    const result = await saveUserProfile(profile);
+
+    // Also update Supabase auth metadata if configured
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            nombre: updatedUser.nombre,
+            full_name: updatedUser.nombre,
+            avatar_url: updatedUser.avatarUrl,
+          },
+        });
+      } catch (err) {
+        console.warn('Error updating Supabase auth metadata:', err);
+      }
+    }
+
+    return result;
+  };
 
   // Auth modal state
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
@@ -350,6 +431,7 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
         user,
         session,
         loading,
+        userPreferences,
         authModalOpen,
         modalTab,
         pendingPlan,
@@ -358,6 +440,8 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
         signIn,
         signInWithGoogle,
         signOut,
+        updateUserProfile,
+        updateUserPreferences,
         requireAuthForPayment,
         openAuthModal,
         closeAuthModal,

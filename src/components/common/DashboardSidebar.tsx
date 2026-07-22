@@ -6,6 +6,7 @@ import {
   Users, 
   Bot, 
   CreditCard,
+  FolderKey,
   ExternalLink,
   ShieldCheck,
   Globe2
@@ -48,6 +49,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       label: 'Configurador Aria Prop',
       icon: Bot,
       badge: 'Script Embed',
+    },
+    {
+      id: 'dashboard-files' as AppRoute,
+      label: 'Mis Archivos & Perfil',
+      icon: FolderKey,
+      badge: 'Supabase',
     },
     {
       id: 'dashboard-checkout' as AppRoute,

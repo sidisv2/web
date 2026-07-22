@@ -13,6 +13,7 @@ import { PropertiesView } from '../dashboard/PropertiesView';
 import { LeadsView } from '../dashboard/LeadsView';
 import { BotConfigView } from '../dashboard/BotConfigView';
 import { CheckoutView } from '../dashboard/CheckoutView';
+import { UserProfileDashboard } from '../profile/UserProfileDashboard';
 import { EmbedChatWidget } from '../embed/EmbedChatWidget';
 
 interface MobileViewProps {
@@ -86,6 +87,15 @@ export const MobileView: React.FC<MobileViewProps> = ({
         {currentRoute === 'dashboard-checkout' && (
           <div className="p-2 sm:p-4">
             <CheckoutView onRouteChange={onRouteChange} />
+          </div>
+        )}
+
+        {(currentRoute === 'dashboard-files' || currentRoute === 'dashboard-profile') && (
+          <div className="p-2 sm:p-4">
+            <UserProfileDashboard
+              initialTab={currentRoute === 'dashboard-profile' ? 'profile' : 'files'}
+              onRouteChange={onRouteChange}
+            />
           </div>
         )}
 

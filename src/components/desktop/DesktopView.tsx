@@ -12,6 +12,7 @@ import { PropertiesView } from '../dashboard/PropertiesView';
 import { LeadsView } from '../dashboard/LeadsView';
 import { BotConfigView } from '../dashboard/BotConfigView';
 import { CheckoutView } from '../dashboard/CheckoutView';
+import { UserProfileDashboard } from '../profile/UserProfileDashboard';
 import { EmbedChatWidget } from '../embed/EmbedChatWidget';
 import { AuthModal } from '../auth/AuthModal';
 
@@ -84,6 +85,12 @@ export const DesktopView: React.FC<DesktopViewProps> = ({
             )}
             {currentRoute === 'dashboard-checkout' && (
               <CheckoutView onRouteChange={onRouteChange} />
+            )}
+            {(currentRoute === 'dashboard-files' || currentRoute === 'dashboard-profile') && (
+              <UserProfileDashboard
+                initialTab={currentRoute === 'dashboard-profile' ? 'profile' : 'files'}
+                onRouteChange={onRouteChange}
+              />
             )}
           </main>
         </div>

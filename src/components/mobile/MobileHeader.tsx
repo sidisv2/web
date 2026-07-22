@@ -59,17 +59,23 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
           {user ? (
             <div className="flex items-center gap-1.5 pl-1">
-              {user.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.nombre}
-                  className="w-7 h-7 rounded-full border border-emerald-400 object-cover"
-                />
-              ) : (
-                <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs flex items-center justify-center">
-                  {user.nombre.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <button
+                onClick={() => onRouteChange('dashboard-files')}
+                className="cursor-pointer active:scale-90 transition-transform"
+                title="Mis Archivos & Perfil"
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.nombre}
+                    className="w-7 h-7 rounded-full border border-emerald-400 object-cover"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs flex items-center justify-center">
+                    {user.nombre.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </button>
               <button
                 onClick={signOut}
                 className="p-1.5 rounded-lg bg-slate-900 border border-white/10 text-slate-400 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
@@ -136,7 +142,18 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 : 'bg-slate-900 text-slate-400 border border-white/5'
             }`}
           >
-            ⚙️ Configurar Bot
+            ⚙️ Bot
+          </button>
+
+          <button
+            onClick={() => onRouteChange('dashboard-files')}
+            className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+              currentRoute === 'dashboard-files' || currentRoute === 'dashboard-profile'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                : 'bg-slate-900 text-slate-400 border border-white/5'
+            }`}
+          >
+            📁 Mis Archivos
           </button>
 
           <button

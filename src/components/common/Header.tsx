@@ -114,23 +114,27 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
 
           {user ? (
             <div className="flex items-center gap-2.5 pl-2 border-l border-white/10">
-              <div className="flex items-center gap-2">
+              <button
+                onClick={() => onRouteChange('dashboard-files')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group"
+                title="Ir a mi perfil y archivos"
+              >
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
                     alt={user.nombre}
-                    className="w-8 h-8 rounded-full border border-emerald-500/50 object-cover"
+                    className="w-8 h-8 rounded-full border border-emerald-500/50 object-cover group-hover:scale-105 transition-transform"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-xs group-hover:scale-105 transition-transform">
                     {user.nombre.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="text-left hidden sm:block">
-                  <p className="text-xs font-bold text-white max-w-[120px] truncate">{user.nombre}</p>
-                  <p className="text-[10px] text-emerald-400">Sesión Activa</p>
+                  <p className="text-xs font-bold text-white max-w-[120px] truncate group-hover:text-emerald-400 transition-colors">{user.nombre}</p>
+                  <p className="text-[10px] text-emerald-400">Perfil & Archivos</p>
                 </div>
-              </div>
+              </button>
 
               <button
                 onClick={signOut}

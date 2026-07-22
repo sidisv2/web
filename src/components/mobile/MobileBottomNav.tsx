@@ -94,17 +94,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           )}
         </button>
 
-        {/* Tab 5: Cuenta / Profile / Auth */}
+        {/* Tab 5: Cuenta / Archivos / Auth */}
         <button
           onClick={() => {
             if (!user) {
               openAuthModal('login');
             } else {
-              onRouteChange('dashboard-bot-config');
+              onRouteChange('dashboard-files');
             }
           }}
           className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all active:scale-90 cursor-pointer ${
-            currentRoute === 'dashboard-bot-config'
+            currentRoute === 'dashboard-files' || currentRoute === 'dashboard-profile'
               ? 'text-emerald-400 bg-emerald-500/10 font-bold'
               : user
               ? 'text-teal-400'
@@ -125,7 +125,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             <LogIn className="w-5 h-5" />
           )}
           <span className="text-[10px] mt-1 tracking-tight">
-            {user ? user.nombre.split(' ')[0] : 'Ingresar'}
+            {user ? 'Archivos' : 'Ingresar'}
           </span>
         </button>
 
