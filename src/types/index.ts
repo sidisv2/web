@@ -107,7 +107,19 @@ export type AppRoute =
   | 'dashboard-properties'
   | 'dashboard-leads'
   | 'dashboard-bot-config'
+  | 'dashboard-checkout'
   | 'embed-preview';
+
+export interface PaymentLinkConfig {
+  planId: string;
+  planName: string;
+  priceUsd: number;
+  customPaymentUrl: string;
+  mercadoPagoUrl?: string;
+  paypalUrl?: string;
+  stripeUrl?: string;
+  whatsappPayNumber?: string;
+}
 
 export interface Agency {
   id: string;

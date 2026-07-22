@@ -61,18 +61,18 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange })
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-white">{isAnnual ? '149€' : '189€'}</span>
-                  <span className="text-xs text-slate-400">/mes</span>
+                  <span className="text-4xl font-extrabold text-white">{isAnnual ? '$49' : '$59'}</span>
+                  <span className="text-xs text-slate-400">USD / mes</span>
                 </div>
-                {isAnnual && <p className="text-[10px] text-emerald-400 mt-1">Facturado anualmente (1.788€/año)</p>}
+                {isAnnual && <p className="text-[10px] text-emerald-400 mt-1">Facturado anualmente ($588 USD/año)</p>}
               </div>
 
               <ul className="space-y-3 text-xs text-slate-300 border-t border-white/10 pt-6">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400" /> 1 Agente de IA activo
+                  <Check className="w-4 h-4 text-emerald-400" /> 1 Agente IA Aria Prop activo
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400" /> Hasta 25 Propiedades en Catálogo
+                  <Check className="w-4 h-4 text-emerald-400" /> Hasta 20 Propiedades en Catálogo
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-400" /> 500 Conversaciones/mes
@@ -84,59 +84,59 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onRouteChange })
             </div>
 
             <button
-              onClick={() => onRouteChange('dashboard-metrics')}
+              onClick={() => onRouteChange('dashboard-checkout')}
               className="mt-8 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-white/10 transition-all cursor-pointer"
             >
-              Comenzar con Starter
+              Seleccionar Plan Starter
             </button>
           </div>
 
           {/* Pro Enterprise Plan (Highlighted) */}
           <div className="rounded-3xl bg-slate-900 border-2 border-emerald-500 p-8 flex flex-col justify-between shadow-2xl shadow-emerald-500/20 relative transform md:-translate-y-2">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-slate-950 text-[11px] font-bold uppercase tracking-wider shadow-lg flex items-center gap-1">
-              <Sparkles className="w-3 h-3" /> Opción Más Elegida por Agencias
+              <Sparkles className="w-3 h-3" /> Opción Más Elegida en LATAM
             </div>
 
             <div className="space-y-6 pt-2">
               <div>
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  Pro Enterprise
+                  Pro Enterprise LATAM
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">Para agencias consolidadas y promotoras de lujo.</p>
+                <p className="text-xs text-slate-400 mt-1">Para agencias consolidadas y desarrolladoras inmobiliarias.</p>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-extrabold text-white">{isAnnual ? '399€' : '499€'}</span>
-                  <span className="text-xs text-slate-400">/mes</span>
+                  <span className="text-5xl font-extrabold text-white">{isAnnual ? '$149' : '$179'}</span>
+                  <span className="text-xs text-slate-400">USD / mes</span>
                 </div>
-                {isAnnual && <p className="text-[10px] text-emerald-400 mt-1">Facturado anualmente (4.788€/año)</p>}
+                {isAnnual && <p className="text-[10px] text-emerald-400 mt-1">Facturado anualmente ($1,788 USD/año)</p>}
               </div>
 
               <ul className="space-y-3 text-xs text-slate-200 border-t border-white/10 pt-6">
                 <li className="flex items-center gap-2 font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Agentes IA ilimitados
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> 3 Agentes IA Aria Prop activos
                 </li>
                 <li className="flex items-center gap-2 font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Hasta 250 Propiedades + Documentos RAG
-                </li>
-                <li className="flex items-center gap-2 font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Conversaciones Ilimitadas
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Propiedades y Chats Ilimitados + RAG PDFs
                 </li>
                 <li className="flex items-center gap-2 font-medium text-emerald-300">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Conexión Nativa WhatsApp Business API
                 </li>
                 <li className="flex items-center gap-2 font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Lead Scoring & CRM Export (Salesforce/Idealista)
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Pagos en Mercado Pago, Tarjetas, SPEI, PSE, PayPal
+                </li>
+                <li className="flex items-center gap-2 font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" /> Lead Scoring & Human-in-the-loop
                 </li>
               </ul>
             </div>
 
             <button
-              onClick={() => onRouteChange('dashboard-metrics')}
+              onClick={() => onRouteChange('dashboard-checkout')}
               className="mt-8 w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-xs shadow-lg transition-all cursor-pointer"
             >
-              Probar 7 Días con Pro Enterprise
+              Pagar con Mercado Pago / Tarjeta
             </button>
           </div>
 

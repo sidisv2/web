@@ -3,12 +3,11 @@ import { AppRoute } from '../../types';
 import { RealtimeDot } from './RealtimeDot';
 import { 
   Building2, 
-  Bot, 
   LayoutDashboard, 
-  Users, 
   Sliders, 
   Code, 
   Sparkles,
+  CreditCard,
   ArrowRight
 } from 'lucide-react';
 
@@ -18,7 +17,7 @@ interface HeaderProps {
   agencyName?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, agencyName = 'Inmobiliaria Premier España' }) => {
+export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, agencyName = 'Aria Prop LATAM' }) => {
   const isDashboard = currentRoute.startsWith('dashboard');
 
   return (
@@ -34,10 +33,10 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-lg tracking-tight text-white">PropTech<span className="text-emerald-400">AI</span></span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Enterprise</span>
+              <span className="font-bold text-lg tracking-tight text-white">Aria <span className="text-emerald-400">Prop</span></span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LATAM AI</span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block">Agentes de IA para el Sector Inmobiliario</p>
+            <p className="text-[11px] text-slate-400 hidden sm:block">Agentes de IA Inmobiliaria para Latinoamérica</p>
           </div>
         </div>
 
@@ -52,19 +51,31 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Landing Page</span>
+            <span>Inicio</span>
           </button>
 
           <button
             onClick={() => onRouteChange('dashboard-metrics')}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
-              isDashboard
+              isDashboard && currentRoute !== 'dashboard-checkout'
                 ? 'bg-white/10 text-white font-semibold border border-white/10 shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5 text-emerald-400" />
             <span>Dashboard Agencia</span>
+          </button>
+
+          <button
+            onClick={() => onRouteChange('dashboard-checkout')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+              currentRoute === 'dashboard-checkout'
+                ? 'bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Planes & Pagos</span>
           </button>
 
           <button
@@ -88,12 +99,12 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, age
             <div className="flex items-center gap-2 pl-2 border-l border-white/10">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-semibold text-white">{agencyName}</p>
-                <p className="text-[10px] text-emerald-400">Plan Enterprise Activo</p>
+                <p className="text-[10px] text-emerald-400">Pro LATAM Activo</p>
               </div>
               <button
                 onClick={() => onRouteChange('dashboard-bot-config')}
-                className="p-2 rounded-lg bg-slate-900 border border-white/10 text-slate-300 hover:text-white hover:border-emerald-500/40 transition-all"
-                title="Configuración del Bot"
+                className="p-2 rounded-lg bg-slate-900 border border-white/10 text-slate-300 hover:text-white hover:border-emerald-500/40 transition-all cursor-pointer"
+                title="Configuración del Bot Aria Prop"
               >
                 <Sliders className="w-4 h-4" />
               </button>

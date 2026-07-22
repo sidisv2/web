@@ -12,6 +12,7 @@ import { MetricsView } from './components/dashboard/MetricsView';
 import { PropertiesView } from './components/dashboard/PropertiesView';
 import { LeadsView } from './components/dashboard/LeadsView';
 import { BotConfigView } from './components/dashboard/BotConfigView';
+import { CheckoutView } from './components/dashboard/CheckoutView';
 import { EmbedChatWidget } from './components/embed/EmbedChatWidget';
 
 export default function App() {
@@ -152,6 +153,9 @@ export default function App() {
             )}
             {currentRoute === 'dashboard-bot-config' && (
               <BotConfigView botConfig={botConfig} onUpdateBotConfig={handleUpdateBotConfig} />
+            )}
+            {currentRoute === 'dashboard-checkout' && (
+              <CheckoutView onRouteChange={setCurrentRoute} />
             )}
           </main>
         </div>

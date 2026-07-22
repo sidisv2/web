@@ -25,22 +25,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ sampleProperties, onRo
             {/* Top Shiny Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-emerald-500/30 shadow-lg shadow-emerald-500/10">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-xs font-semibold text-emerald-300">Novedad: Conexión nativa con WhatsApp Business API</span>
+              <span className="text-xs font-semibold text-emerald-300">Novedad: Aria Prop para Latinoamérica (WhatsApp & CRM)</span>
               <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
             </div>
 
             {/* Impact Title */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
-              Agentes de IA que <br className="hidden sm:block" />
+              Aria Prop: IA que <br className="hidden sm:block" />
               <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                Venden y Cualifican
+                Cualifica y Vende
               </span> <br />
-              Inmuebles 24/7.
+              Inmuebles en LATAM.
             </h1>
 
             {/* Subtitle */}
             <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl font-normal">
-              Aumenta la captura de leandings inmobiliarios en un <strong className="text-emerald-400 font-bold">340%</strong>. Tu agente de IA responde preguntas sobre planos, precios y memoria de calidades en menos de 1 segundo e integra directamente con tu CRM.
+              Automatiza la atención de tu agencia inmobiliaria en México, Colombia, Argentina, Chile y Perú. <strong className="text-emerald-400 font-bold">Aria Prop</strong> responde consultas sobre planos, precios en USD y agendas por WhatsApp en menos de 1 segundo.
             </p>
 
             {/* CTA Buttons */}

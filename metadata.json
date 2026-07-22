@@ -1,6 +1,6 @@
 {
-  "name": "PropTech AI Agent",
-  "description": "Enterprise B2B AI Agent platform for the Real Estate sector",
+  "name": "Aria Prop LATAM",
+  "description": "SaaS B2B AI Agent platform for Real Estate in Latin America",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

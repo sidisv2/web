@@ -14,12 +14,12 @@ export const Footer: React.FC = () => {
               <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
                 <Building2 className="w-4 h-4" />
               </div>
-              <span className="font-bold text-white text-base">PropTech<span className="text-emerald-400">AI</span></span>
+              <span className="font-bold text-white text-base">Aria <span className="text-emerald-400">Prop</span></span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
-              Plataforma B2B Enterprise de Agentes Inteligentes para el sector inmobiliario en España y Latinoamérica.
+              Plataforma SaaS B2B de Agentes Inmobiliarios con Inteligencia Artificial para Latinoamérica.
             </p>
-            <RealtimeDot label="Todos los sistemas operando al 100%" />
+            <RealtimeDot label="Aria Prop en línea al 100% en LATAM" />
           </div>
 
           <div>
