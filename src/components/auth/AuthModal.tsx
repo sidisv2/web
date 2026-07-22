@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase, upsertProfile } from '../../lib/supabaseClient';
+import { supabase, saveUserProfile as upsertProfile, isSupabaseConfigured } from '../../lib/supabase';
 
 export const AuthModal: React.FC<{
   isOpen: boolean;
@@ -19,6 +19,15 @@ export const AuthModal: React.FC<{
     setLoading(true);
     setErrorMsg(null);
     try {
+      if (!isSupabaseConfigured || !supabase) {
+        // Fallback mock login
+        const mockUserId = `mock_${Date.now()}`;
+        await upsertProfile({ id: mockUserId, email, display_name: displayName || email.split('@')[0] || null, estado_cuenta: 'gratis' });
+        onAuthSuccess?.();
+        onClose();
+        return;
+      }
+
       const { error, data } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       if (data?.user) {
@@ -37,6 +46,15 @@ export const AuthModal: React.FC<{
     setLoading(true);
     setErrorMsg(null);
     try {
+      if (!isSupabaseConfigured || !supabase) {
+        // Mock signup
+        const mockUserId = `mock_${Date.now()}`;
+        await upsertProfile({ id: mockUserId, email, display_name: displayName || email.split('@')[0] || null, estado_cuenta: 'gratis' });
+        onAuthSuccess?.();
+        onClose();
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: displayName } } });
       if (error) throw error;
       if (data?.user) {
@@ -53,10 +71,13 @@ export const AuthModal: React.FC<{
 
   const handleGoogle = async () => {
     try {
+      if (!isSupabaseConfigured || !supabase) {
+        setErrorMsg('Google OAuth no está configurado. Usa correo y contraseña o configura OAuth en Supabase. (Modo demo)');
+        return;
+      }
       await supabase.auth.signInWithOAuth({ provider: 'google' });
-      // OAuth redirect handled by Supabase; do not throw if credentials missing
+      // OAuth redirect handled by Supabase
     } catch (err: any) {
-      // Friendly message, prevents console error if credentials absent
       setErrorMsg('Google OAuth no está configurado. Usa correo y contraseña o configura OAuth en Supabase.');
     }
   };

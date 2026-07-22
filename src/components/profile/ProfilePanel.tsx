@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../lib/supabase';
 import { listUserFiles, uploadUserFile, downloadUserFile, deleteUserFile } from '../../lib/storage';
 
 export const ProfilePanel: React.FC = () => {
@@ -11,13 +11,17 @@ export const ProfilePanel: React.FC = () => {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.auth.getSession();
-      const user = data?.session?.user || null;
-      setSessionUser(user);
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('display_name,avatar_url,estado_cuenta,trial_ends_at').eq('id', user.id).single();
-        setName((profile as any)?.display_name || '');
-        await refreshFiles(user.id);
+      try {
+        const { data } = supabase ? await supabase.auth.getSession() : { data: null };
+        const user = data?.session?.user || null;
+        setSessionUser(user);
+        if (user) {
+          const { data: profile } = await supabase.from('profiles').select('display_name,avatar_url,estado_cuenta,trial_ends_at').eq('id', user.id).single();
+          setName((profile as any)?.display_name || '');
+          await refreshFiles(user.id);
+        }
+      } catch (err) {
+        console.warn(err);
       }
     }
     load();

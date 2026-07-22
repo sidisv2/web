@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase, upsertProfile } from '../../lib/supabaseClient';
+import { supabase, saveUserProfile, isSupabaseConfigured } from '../../lib/supabase';
 import AuthModal from '../auth/AuthModal';
 
 export const PaywallModal: React.FC<{ isOpen: boolean; onClose: () => void; onSubscriptionActivated?: () => void; }> = ({ isOpen, onClose, onSubscriptionActivated }) => {
@@ -13,6 +13,17 @@ export const PaywallModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
     setLoading(true);
     setError(null);
     try {
+      if (!isSupabaseConfigured || !supabase) {
+        // Mock activation: write to local storage via saveUserProfile
+        const mockSession = (await supabase?.auth?.getSession?.()) || null;
+        const fakeUserId = mockSession?.session?.user?.id || `mock_${Date.now()}`;
+        await saveUserProfile({ id: fakeUserId, email: 'demo@local', nombre: 'Usuario Demo', fecha_registro: new Date().toISOString(), estado_cuenta: 'plan_activo', fecha_fin_prueba: new Date(Date.now() + 7*24*60*60*1000).toISOString() });
+        try { localStorage.setItem('sent_messages_count', '0'); } catch {}
+        onSubscriptionActivated?.();
+        onClose();
+        return;
+      }
+
       const { data: sessionData } = await supabase.auth.getSession();
       const user = sessionData?.session?.user;
       if (!user) {

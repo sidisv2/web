@@ -27,3 +27,6 @@
 .chat-messages { color: #e6eef2; }
 .chat-input .input { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px; width: 100%; }
 .send-btn { background: #10b981; border-radius: 10px; padding: 10px; margin-left: 8px; display:flex; align-items:center; }
+
+/* Emergency patch to avoid blank screen while debugging */
+:root, body, #root, main { visibility: visible !important; opacity: 1 !important; display: block !important; }
