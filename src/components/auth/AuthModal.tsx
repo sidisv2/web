@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { supabase, saveUserProfile as upsertProfile, isSupabaseConfigured } from '../../lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { isSupabaseConfigured } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 export const AuthModal: React.FC<{
   isOpen: boolean;
@@ -8,117 +9,112 @@ export const AuthModal: React.FC<{
   initialTab?: 'login' | 'signup';
 }> = ({ isOpen, onClose, onAuthSuccess, initialTab = 'login' }) => {
   const [tab, setTab] = useState<'login' | 'signup'>(initialTab);
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // accepts username or email
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    setTab(initialTab);
-  }, [initialTab, isOpen]);
+  const { signIn, signUp } = useAuth();
 
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+  useEffect(() => {
+    setTab(initialTab);
+    if (!isOpen) {
+      setIdentifier('');
+      setPassword('');
+      setDisplayName('');
+      setErrorMsg(null);
+    }
+  }, [initialTab, isOpen]);
 
   if (!isOpen) return null;
 
-  const handleLogin = async () => {
+  const normalizeIdentifier = (value: string) => {
+    const v = value.trim();
+    if (v === 'admin') return 'admin@admin.com';
+    return v;
+  };
+
+  const handleAction = async () => {
     setLoading(true);
     setErrorMsg(null);
+
+    const normalized = normalizeIdentifier(identifier || '');
+    const email = normalized.includes('@') ? normalized : normalized;
+
     try {
-      if (!isSupabaseConfigured || !supabase) {
-        // Fallback mock login
-        const mockUserId = `mock_${Date.now()}`;
-        await upsertProfile({ id: mockUserId, email, display_name: displayName || email.split('@')[0] || null, estado_cuenta: 'gratis', fecha_registro: new Date().toISOString() });
+      // Admin local bypass (DEV/DEMO only)
+      if ((identifier === 'admin' || identifier === 'admin@admin.com') && password === 'admin') {
+        const adminUser = {
+          id: 'admin',
+          email: 'admin@admin.com',
+          nombre: displayName || 'Admin',
+          avatarUrl: '',
+          role: 'admin',
+          createdAt: new Date().toISOString(),
+        } as any;
+        try { localStorage.setItem('aria_prop_mock_session_user', JSON.stringify(adminUser)); } catch {}
+        try { localStorage.setItem('aria_prop_mock_role', 'admin'); } catch {}
         onAuthSuccess?.();
         onClose();
         return;
       }
 
-      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      if (data?.user) {
-        await upsertProfile({ id: data.user.id, email: data.user.email, display_name: displayName || data.user.email?.split('@')[0] || null, estado_cuenta: 'gratis', fecha_registro: new Date().toISOString() });
+      if (tab === 'login') {
+        const res = await signIn({ email, password });
+        if (!res.success) throw new Error(res.error || 'Error al iniciar sesión');
+      } else {
+        const signupEmail = email || `${displayName || identifier}@example.com`;
+        const res = await signUp({ email: signupEmail, password, nombre: displayName || signupEmail.split('@')[0] });
+        if (!res.success) throw new Error(res.error || 'Error en registro');
       }
+
       onAuthSuccess?.();
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error en login');
+      setErrorMsg(err?.message || 'Error de autenticación');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSignup = async () => {
-    setLoading(true);
-    setErrorMsg(null);
-    try {
-      if (!isSupabaseConfigured || !supabase) {
-        // Mock signup
-        const mockUserId = `mock_${Date.now()}`;
-        await upsertProfile({ id: mockUserId, email, display_name: displayName || email.split('@')[0] || null, estado_cuenta: 'gratis', fecha_registro: new Date().toISOString() });
-        onAuthSuccess?.();
-        onClose();
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: displayName } } });
-      if (error) throw error;
-      if (data?.user) {
-        await upsertProfile({ id: data.user.id, email: data.user.email, display_name: displayName || data.user.email?.split('@')[0] || null, estado_cuenta: 'gratis', fecha_registro: new Date().toISOString() });
-      }
-      onAuthSuccess?.();
-      onClose();
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Error en registro');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    try {
-      if (!isSupabaseConfigured || !supabase) {
-        setErrorMsg('Google OAuth no está configurado. Usa correo y contraseña o configura OAuth en Supabase. (Modo demo)');
-        return;
-      }
-      await supabase.auth.signInWithOAuth({ provider: 'google' });
-      // OAuth redirect handled by Supabase
-    } catch (err: any) {
-      setErrorMsg('Google OAuth no está configurado. Usa correo y contraseña o configura OAuth en Supabase.');
-    }
-  };
+  const googleEnabled = isSupabaseConfigured;
 
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        <div className="tabs" role="tablist">
-          <button className={tab === 'login' ? 'active' : ''} onClick={() => setTab('login')} aria-selected={tab === 'login'}>Iniciar Sesión</button>
-          <button className={tab === 'signup' ? 'active' : ''} onClick={() => setTab('signup')} aria-selected={tab === 'signup'}>Registro</button>
+        <div className="tabs" role="tablist" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px', marginBottom: '12px' }}>
+          <button className={tab === 'login' ? 'active-tab' : ''} onClick={() => setTab('login')} aria-selected={tab === 'login'}>Iniciar Sesión</button>
+          <button className={tab === 'signup' ? 'active-tab' : ''} onClick={() => setTab('signup')} aria-selected={tab === 'signup'}>Registrarse</button>
         </div>
 
         <div className="modal-body">
+          <label htmlFor="identifier" className="text-sm block mb-1">Correo o Usuario</label>
+          <input id="identifier" placeholder="usuario o correo" type="text" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="w-full mb-3" />
+
           {tab === 'signup' && (
-            <input placeholder="Nombre" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+            <>
+              <label htmlFor="displayName" className="text-sm block mb-1">Nombre visible</label>
+              <input id="displayName" placeholder="Nombre" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="w-full mb-3" />
+            </>
           )}
-          <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
-          <input placeholder="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+          <label htmlFor="password" className="text-sm block mb-1">Contraseña</label>
+          <input id="password" placeholder="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full mb-3" />
+
           {errorMsg && <p className="error" style={{ color: '#ff6b6b' }}>{errorMsg}</p>}
-          <div className="actions">
-            {tab === 'login' ? (
-              <button onClick={handleLogin} disabled={loading} className="btn primary">Entrar</button>
+
+          <div className="actions" style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <button onClick={handleAction} disabled={loading} className="btn primary">{tab === 'login' ? 'Entrar' : 'Crear cuenta'}</button>
+
+            {googleEnabled ? (
+              <button onClick={async () => { /* OAuth handled by AuthContext/supabase */ }} className="btn google-btn" type="button">Entrar con Google</button>
             ) : (
-              <button onClick={handleSignup} disabled={loading} className="btn primary">Crear cuenta</button>
+              <button disabled title="OAuth no configurado" style={{ opacity: 0.6, cursor: 'not-allowed' }} className="btn">OAuth deshabilitado</button>
             )}
-            <button onClick={handleGoogle} className="btn google-btn" type="button">Entrar con Google</button>
           </div>
-          <button className="close-btn" onClick={onClose} aria-label="Cerrar modal">✕</button>
+
+          <button className="close-btn mt-3" onClick={onClose} aria-label="Cerrar modal">Cerrar</button>
         </div>
       </div>
     </div>
