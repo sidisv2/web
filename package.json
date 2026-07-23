@@ -22,7 +22,9 @@
     "motion": "^12.23.24",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
-    "vite": "^6.2.3"
+    "vite": "^6.2.3",
+    "marked": "^5.1.0",
+    "dompurify": "^3.0.8"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
