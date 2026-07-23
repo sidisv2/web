@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured, saveUserProfile, UserProfile } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, saveUserProfile, UserProfile, getUserProfile } from '../lib/supabase';
 import { AppRoute, UserPreferences } from '../types';
-import AuthModal from '../components/auth/AuthModal';
 
 export interface AppUser {
   id: string;
@@ -10,6 +9,7 @@ export interface AppUser {
   nombre: string;
   avatarUrl?: string;
   createdAt: string;
+  role?: 'user' | 'admin';
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
@@ -150,7 +150,8 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
           const stored = localStorage.getItem(LOCAL_STORAGE_SESSION_KEY);
           if (stored && mounted) {
             const parsed = JSON.parse(stored);
-            setUser(parsed);
+            const storedRole = localStorage.getItem('aria_prop_mock_role') || parsed.role || undefined;
+            setUser({ ...parsed, role: storedRole });
           }
         } catch (err) {
           console.warn('Error reading local mock auth session:', err);
@@ -177,24 +178,22 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
 
     return () => {
       mounted = false;
-      try {
-        authListener.subscription.unsubscribe();
-      } catch {}
+      try { authListener.subscription.unsubscribe(); } catch {}
     };
   }, []);
 
   // Helper to map Supabase user to AppUser & save to profiles table
   const mapSupabaseUserToAppUser = async (sbUser: SupabaseUser) => {
     const nombre =
-      sbUser.user_metadata?.nombre ||
-      sbUser.user_metadata?.full_name ||
-      sbUser.user_metadata?.name ||
+      (sbUser.user_metadata as any)?.nombre ||
+      (sbUser.user_metadata as any)?.full_name ||
+      (sbUser.user_metadata as any)?.name ||
       sbUser.email?.split('@')[0] ||
       'Usuario';
 
     const avatarUrl =
-      sbUser.user_metadata?.avatar_url ||
-      sbUser.user_metadata?.picture ||
+      (sbUser.user_metadata as any)?.avatar_url ||
+      (sbUser.user_metadata as any)?.picture ||
       `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=10b981&color=fff`;
 
     const appUser: AppUser = {
@@ -205,17 +204,24 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
       createdAt: sbUser.created_at || new Date().toISOString(),
     };
 
-    setUser(appUser);
+    // Try to retrieve role from profiles table (if present)
+    try {
+      const profile = await getUserProfile(sbUser.id);
+      const role = (profile as any)?.role || 'user';
+      setUser({ ...appUser, role });
 
-    // Save profile to Supabase database (profiles / usuarios table)
-    const profile: UserProfile = {
-      id: appUser.id,
-      email: appUser.email,
-      nombre: appUser.nombre,
-      fecha_registro: appUser.createdAt,
-      avatar_url: appUser.avatarUrl,
-    };
-    await saveUserProfile(profile);
+      // Ensure profile saved
+      const profilePayload: UserProfile = {
+        id: appUser.id,
+        email: appUser.email,
+        nombre: appUser.nombre,
+        fecha_registro: appUser.createdAt,
+        avatar_url: appUser.avatarUrl,
+      };
+      await saveUserProfile(profilePayload);
+    } catch (err) {
+      setUser({ ...appUser, role: 'user' });
+    }
   };
 
   // Execute post-authentication action if user had a pending payment selection
@@ -277,10 +283,12 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
         nombre: nombre || email.split('@')[0],
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre || email)}&background=10b981&color=fff`,
         createdAt: new Date().toISOString(),
+        role: email === 'admin@admin.com' ? 'admin' : 'user',
       };
 
       setUser(mockUser);
-      try { localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(mockUser)); } catch {}
+      localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(mockUser));
+      localStorage.setItem('aria_prop_mock_role', mockUser.role || 'user');
 
       // Save to local profile storage
       await saveUserProfile({
@@ -336,10 +344,12 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
         nombre: email.split('@')[0],
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=10b981&color=fff`,
         createdAt: new Date().toISOString(),
+        role: email === 'admin@admin.com' ? 'admin' : 'user',
       };
 
       setUser(mockUser);
-      try { localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(mockUser)); } catch {}
+      localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(mockUser));
+      localStorage.setItem('aria_prop_mock_role', mockUser.role || 'user');
 
       setAuthModalOpen(false);
       handlePostAuthAction();
@@ -374,10 +384,12 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
         nombre: 'Usuario Google LATAM',
         avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
         createdAt: new Date().toISOString(),
+        role: 'user',
       };
 
       setUser(mockUser);
-      try { localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(mockUser)); } catch {}
+      localStorage.setItem(LOCAL_STORAGE_SESSION_KEY, JSON.stringify(mockUser));
+      localStorage.setItem('aria_prop_mock_role', mockUser.role || 'user');
 
       setAuthModalOpen(false);
       handlePostAuthAction();
@@ -395,6 +407,7 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
     setUser(null);
     setSession(null);
     try { localStorage.removeItem(LOCAL_STORAGE_SESSION_KEY); } catch {}
+    try { localStorage.removeItem('aria_prop_mock_role'); } catch {}
     setLoading(false);
   };
 
@@ -450,21 +463,6 @@ export const AuthProvider: React.FC<{ children: ReactNode; onRouteChange?: (rout
         closeAuthModal,
       }}
     >
-      {/* Render the Auth modal at the provider level so any component can open it via context */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={closeAuthModal}
-        onAuthSuccess={() => {
-          // After successful auth, execute any pending actions
-          try {
-            handlePostAuthAction();
-          } catch (e) {
-            console.warn('Error handling post auth action', e);
-          }
-        }}
-        initialTab={modalTab}
-      />
-
       {children}
     </AuthContext.Provider>
   );
